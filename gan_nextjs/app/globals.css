@@ -242,6 +242,10 @@ input {
   font-size: 0.93rem;
 }
 
+.meta-block {
+  margin-top: 18px;
+}
+
 @media (max-width: 940px) {
   .grid {
     grid-template-columns: 1fr;

@@ -1,152 +1,118 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState } from "react";
 
-function buildImageUrl(name, updatedAt) {
-  if (!name) {
+function pickRandomImage(images, currentSrc = null) {
+  if (!images.length) {
     return null;
   }
 
-  const params = new URLSearchParams({
-    name,
-    ts: String(updatedAt ?? Date.now()),
-  });
-  return `/api/image?${params.toString()}`;
+  if (images.length === 1) {
+    return images[0];
+  }
+
+  let candidate = images[Math.floor(Math.random() * images.length)];
+
+  while (candidate.src === currentSrc) {
+    candidate = images[Math.floor(Math.random() * images.length)];
+  }
+
+  return candidate;
 }
 
-function randomSeed() {
-  return Math.floor(Math.random() * 1_000_000_000);
-}
+export default function GeneratePanel({ images = [] }) {
+  const [currentImage, setCurrentImage] = useState(() => pickRandomImage(images));
+  const [lastPickedAt, setLastPickedAt] = useState(() => Date.now());
 
-export default function GeneratePanel({ initialState, metricsPreview }) {
-  const [numImages, setNumImages] = useState(16);
-  const [seed, setSeed] = useState(() => randomSeed());
-  const [lastUsedSeed, setLastUsedSeed] = useState(null);
-  const [imageName, setImageName] = useState(
-    initialState.hasImage ? initialState.defaultImageName : null,
-  );
-  const [updatedAt, setUpdatedAt] = useState(initialState.imageUpdatedAt);
-  const [status, setStatus] = useState(
-    initialState.hasCheckpoint
-      ? "Checkpoint detecte. Tu peux lancer une nouvelle generation."
-      : "Aucun checkpoint trouve dans classicGAN/checkpoints/last.pt.",
-  );
-  const [error, setError] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const imageUrl = useMemo(() => {
+    if (!currentImage) {
+      return null;
+    }
 
-  const imageUrl = useMemo(() => buildImageUrl(imageName, updatedAt), [imageName, updatedAt]);
-
-  async function handleGenerate(event) {
-    event.preventDefault();
-    setError("");
-    setStatus("Generation en cours...");
-
-    const submittedSeed = seed;
-
-    startTransition(async () => {
-      try {
-        const response = await fetch("/api/generate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            numImages,
-            seed: submittedSeed,
-          }),
-        });
-
-        const payload = await response.json();
-        if (!response.ok) {
-          throw new Error(payload.error || "La generation a echoue.");
-        }
-
-        setImageName(payload.imageName);
-        setUpdatedAt(payload.updatedAt);
-        setLastUsedSeed(payload.seed ?? submittedSeed);
-        setSeed(randomSeed());
-        setStatus(payload.message);
-      } catch (err) {
-        setError(err.message);
-        setStatus("La generation a echoue.");
-      }
+    const params = new URLSearchParams({
+      ts: String(lastPickedAt),
     });
+
+    return `${currentImage.src}?${params.toString()}`;
+  }, [currentImage, lastPickedAt]);
+
+  function handlePickNext() {
+    const nextImage = pickRandomImage(images, currentImage?.src ?? null);
+    setCurrentImage(nextImage);
+    setLastPickedAt(Date.now());
   }
 
   return (
     <section className="grid">
       <aside className="panel controls">
-        <h2>Controle rapide</h2>
+        <h2>Mode Vercel</h2>
         <p>
-          Le bouton ci-dessous execute <code>python generate.py</code> dans le dossier
-          <code> classicGAN</code>.
+          Cette interface n&apos;execute plus Python en ligne. Elle affiche une image aleatoire
+          parmi les assets presentes dans <code>gan_nextjs/public/generated</code>.
         </p>
 
-        <form className="form-grid" onSubmit={handleGenerate}>
-          <div className="field">
-            <label htmlFor="num-images">Nombre d&apos;images dans la grille</label>
-            <input
-              id="num-images"
-              type="number"
-              min="1"
-              max="64"
-              value={numImages}
-              onChange={(event) => setNumImages(Number(event.target.value))}
-            />
-          </div>
-
-          <div className="field">
-            <label htmlFor="seed">Seed</label>
-            <input
-              id="seed"
-              type="number"
-              value={seed}
-              onChange={(event) => setSeed(Number(event.target.value))}
-            />
-            <p className="field-help">
-              Seed = valeur qui controle le hasard de generation. Si le seed change, l&apos;image
-              generee change aussi. Un nouveau seed aleatoire est prepare automatiquement apres
-              chaque generation.
-            </p>
-            <button
-              className="secondary-button"
-              type="button"
-              onClick={() => setSeed(randomSeed())}
-              disabled={isPending}
-            >
-              Generer un seed aleatoire
-            </button>
-          </div>
-
-          <button className="primary-button" type="submit" disabled={isPending || !initialState.hasCheckpoint}>
-            {isPending ? "Generation..." : "Generer une nouvelle image"}
+        <div className="form-grid">
+          <button className="primary-button" type="button" onClick={handlePickNext} disabled={!images.length}>
+            {images.length ? "Afficher une autre image" : "Galerie vide"}
           </button>
-        </form>
 
-        <p className={`status${error ? " error" : ""}`}>{error || status}</p>
-
-        <div className="badge-row">
-          <span className="badge">Prochain seed: {seed}</span>
-          {lastUsedSeed !== null ? <span className="badge">Dernier seed: {lastUsedSeed}</span> : null}
+          <p className="field-help">
+            Ajoute tes PNG dans <code>public/generated</code>, puis declare-les dans
+            <code> data/gallery.js</code>. Le site sera ensuite deployable tel quel sur Vercel.
+          </p>
         </div>
 
-        {metricsPreview ? (
-          <p className="meta-line">
-            Derniere ligne de metriques : <code>{metricsPreview}</code>
-          </p>
-        ) : null}
+        <div className="badge-row">
+          <span className="badge">Images: {images.length}</span>
+          <span className="badge">Modele: classicGAN</span>
+          <span className="badge">Mode: statique</span>
+        </div>
+
+        {currentImage ? (
+          <div className="meta-block">
+            <p className="meta-line">
+              Titre : <code>{currentImage.title ?? "Sans titre"}</code>
+            </p>
+            {currentImage.seed !== undefined ? (
+              <p className="meta-line">
+                Seed : <code>{currentImage.seed}</code>
+              </p>
+            ) : null}
+            {currentImage.dataset ? (
+              <p className="meta-line">
+                Dataset : <code>{currentImage.dataset}</code>
+              </p>
+            ) : null}
+            {currentImage.model ? (
+              <p className="meta-line">
+                Variante : <code>{currentImage.model}</code>
+              </p>
+            ) : null}
+          </div>
+        ) : (
+          <div className="meta-block">
+            <p className="meta-line">Aucune image n&apos;est publiee pour l&apos;instant.</p>
+            <p className="meta-line">
+              Tu pourras remplir la galerie apres le deploiement, ou juste avant, en ajoutant les
+              fichiers dans <code>public/generated</code>.
+            </p>
+          </div>
+        )}
       </aside>
 
       <section className="panel viewer">
         <div className="toolbar">
           <div>
-            <h2>Derniere image generee</h2>
-            <p>Le rendu est recharge a chaque generation avec un parametre anti-cache.</p>
+            <h2>Demonstrateur client</h2>
+            <p>
+              Le rendu ci-dessous est choisi aleatoirement dans une galerie statique optimisee pour
+              un deploiement simple sur Vercel.
+            </p>
           </div>
 
           <div className="badge-row">
-            <span className="badge">Checkpoint: {initialState.hasCheckpoint ? "ok" : "absent"}</span>
-            <span className="badge">Fichier: {imageName ?? "aucun"}</span>
+            <span className="badge">Sous-domaine ready</span>
+            <span className="badge">Root: gan_nextjs</span>
             {imageUrl ? (
               <a className="secondary-button" href={imageUrl} target="_blank" rel="noreferrer">
                 Ouvrir l&apos;image
@@ -157,13 +123,14 @@ export default function GeneratePanel({ initialState, metricsPreview }) {
 
         <div className="image-frame">
           {imageUrl ? (
-            <img src={imageUrl} alt="Grille generee par le modele GAN" />
+            <img src={imageUrl} alt={currentImage.title ?? "Image de demonstration classicGAN"} />
           ) : (
             <div className="image-placeholder">
-              <h3>Aucune image affichable pour l&apos;instant.</h3>
+              <h3>Galerie vide pour le moment.</h3>
               <p>
-                Assure-toi d&apos;avoir un checkpoint dans <code>classicGAN/checkpoints/last.pt</code>,
-                puis lance une generation depuis ce panneau.
+                Le deploiement peut partir tout de suite. Quand tu seras pret, ajoute les images
+                dans <code>gan_nextjs/public/generated</code> puis renseigne
+                <code> gan_nextjs/data/gallery.js</code>.
               </p>
             </div>
           )}

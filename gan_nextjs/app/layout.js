@@ -1,8 +1,8 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "GAN Generator",
-  description: "Interface Next.js pour générer des images depuis le checkpoint PyTorch local.",
+  title: "classicGAN Showcase",
+  description: "Demonstrateur Next.js statique pour presenter des generations d'images sur Vercel.",
 };
 
 export default function RootLayout({ children }) {
