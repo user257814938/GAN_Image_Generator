@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Training artifacts
+course_gan/data/
+course_gan/outputs/
+course_gan/checkpoints/
+
+# Next.js / Node
+gan_nextjs/node_modules/
+gan_nextjs/.next/
+
+# Local temp files
+request.json
+*.log
