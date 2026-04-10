@@ -1,6 +1,6 @@
-# Course GAN
+# classicGAN
 
-Prototype simple de GAN base sur le code du cours, entraine sur `CIFAR-10` ou `SVHN`.
+Prototype simple de Vanilla GAN entraine sur `CIFAR-10` ou `SVHN`.
 
 ## Commandes
 

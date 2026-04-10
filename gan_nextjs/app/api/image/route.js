@@ -3,7 +3,7 @@ import path from "node:path";
 
 export const runtime = "nodejs";
 
-const OUTPUT_DIR = path.join(process.cwd(), "..", "course_gan", "outputs");
+const OUTPUT_DIR = path.join(process.cwd(), "..", "classicGAN", "outputs");
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);

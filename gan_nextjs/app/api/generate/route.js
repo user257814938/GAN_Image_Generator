@@ -6,9 +6,9 @@ import { execFile } from "node:child_process";
 export const runtime = "nodejs";
 
 const execFileAsync = promisify(execFile);
-const COURSE_GAN_DIR = path.join(process.cwd(), "..", "course_gan");
-const CHECKPOINT_PATH = path.join(COURSE_GAN_DIR, "checkpoints", "last.pt");
-const OUTPUT_DIR = path.join(COURSE_GAN_DIR, "outputs");
+const CLASSIC_GAN_DIR = path.join(process.cwd(), "..", "classicGAN");
+const CHECKPOINT_PATH = path.join(CLASSIC_GAN_DIR, "checkpoints", "last.pt");
+const OUTPUT_DIR = path.join(CLASSIC_GAN_DIR, "outputs");
 
 function resolvePythonCommand() {
   return process.platform === "win32" ? "python" : "python3";
@@ -18,14 +18,15 @@ export async function POST(request) {
   try {
     if (!existsSync(CHECKPOINT_PATH)) {
       return Response.json(
-        { error: "Checkpoint introuvable dans course_gan/checkpoints/last.pt." },
+        { error: "Checkpoint introuvable dans classicGAN/checkpoints/last.pt." },
         { status: 400 },
       );
     }
 
     const body = await request.json();
     const numImages = Math.min(Math.max(Number(body.numImages) || 16, 1), 64);
-    const seed = Number(body.seed) || 42;
+    const parsedSeed = Number(body.seed);
+    const seed = Number.isFinite(parsedSeed) ? parsedSeed : 42;
     const imageName = `generated_${String(numImages).padStart(2, "0")}.png`;
     const imagePath = path.join(OUTPUT_DIR, imageName);
 
@@ -41,25 +42,26 @@ export async function POST(request) {
         String(seed),
       ],
       {
-        cwd: COURSE_GAN_DIR,
+        cwd: CLASSIC_GAN_DIR,
       },
     );
 
     if (!existsSync(imagePath)) {
       return Response.json(
-        { error: "La génération s’est terminée sans produire de fichier image." },
+        { error: "La generation s'est terminee sans produire de fichier image." },
         { status: 500 },
       );
     }
 
     return Response.json({
       imageName,
+      seed,
       updatedAt: statSync(imagePath).mtimeMs,
-      message: `Image générée avec ${numImages} vignettes et le seed ${seed}.`,
+      message: `Image generee avec ${numImages} vignettes et le seed ${seed}.`,
     });
   } catch (error) {
     return Response.json(
-      { error: error instanceof Error ? error.message : "Erreur inconnue pendant la génération." },
+      { error: error instanceof Error ? error.message : "Erreur inconnue pendant la generation." },
       { status: 500 },
     );
   }

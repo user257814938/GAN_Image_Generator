@@ -1,19 +1,25 @@
 # GAN Image Generator
 
-Prototype de génération d'images avec PyTorch.
+Prototype de generation d'images avec PyTorch.
 
 ## Contenu
 
-- `course_gan/` : entraînement et génération d'images avec un GAN simple sur `CIFAR-10` ou `SVHN`.
-- `gan_nextjs/` : interface Next.js locale pour afficher et relancer la génération depuis le checkpoint.
-- `stylegan/` : dossier réservé pour une future implémentation StyleGAN.
+- `classicGAN/` : entrainement et generation d'images avec un GAN classique sur `CIFAR-10` ou `SVHN`.
+- `gan_nextjs/` : interface Next.js locale pour afficher et relancer la generation depuis le checkpoint.
+- `stylegan/` : dossier reserve pour une future implementation StyleGAN.
+
+## Architecture globale
+
+![Architecture globale du projet](classicGAN/workflow.png)
+
+Fichier source du schema : [`classicGAN/workflow.png`](classicGAN/workflow.png)
 
 ## Lancer le projet
 
-### Entraînement / génération Python
+### Entrainement / generation Python
 
 ```powershell
-cd course_gan
+cd classicGAN
 python train.py --preset improved --dataset svhn
 python generate.py --checkpoint checkpoints/last.pt --num-images 16
 ```

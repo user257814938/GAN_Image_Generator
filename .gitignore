@@ -5,9 +5,9 @@ __pycache__/
 venv/
 
 # Training artifacts
-course_gan/data/
-course_gan/outputs/
-course_gan/checkpoints/
+classicGAN/data/
+classicGAN/outputs/
+classicGAN/checkpoints/
 
 # Next.js / Node
 gan_nextjs/node_modules/

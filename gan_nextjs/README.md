@@ -1,6 +1,6 @@
 # GAN Next.js UI
 
-Interface Next.js locale pour piloter le prototype PyTorch situé dans `../course_gan`.
+Interface Next.js locale pour piloter le prototype PyTorch situe dans `../classicGAN`.
 
 ## Installation
 
@@ -11,10 +11,10 @@ npm run dev
 
 ## Usage
 
-L'app suppose que le checkpoint existe déjà ici :
+L'app suppose que le checkpoint existe deja ici :
 
 ```text
-../course_gan/checkpoints/last.pt
+../classicGAN/checkpoints/last.pt
 ```
 
 Puis ouvre :
@@ -23,7 +23,7 @@ Puis ouvre :
 http://localhost:3000
 ```
 
-Le bouton de génération exécute :
+Le bouton de generation execute :
 
 ```powershell
 python generate.py --checkpoint checkpoints/last.pt --num-images <N> --seed <SEED>

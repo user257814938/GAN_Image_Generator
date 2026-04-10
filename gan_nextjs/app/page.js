@@ -3,9 +3,9 @@ import path from "node:path";
 
 import GeneratePanel from "@/components/generate-panel";
 
-const COURSE_GAN_DIR = path.join(process.cwd(), "..", "course_gan");
-const OUTPUT_DIR = path.join(COURSE_GAN_DIR, "outputs");
-const CHECKPOINT_PATH = path.join(COURSE_GAN_DIR, "checkpoints", "last.pt");
+const CLASSIC_GAN_DIR = path.join(process.cwd(), "..", "classicGAN");
+const OUTPUT_DIR = path.join(CLASSIC_GAN_DIR, "outputs");
+const CHECKPOINT_PATH = path.join(CLASSIC_GAN_DIR, "checkpoints", "last.pt");
 const DEFAULT_IMAGE = "generated_16.png";
 
 function getInitialState() {
@@ -44,11 +44,11 @@ export default function Page() {
     <main className="page-shell">
       <section className="hero">
         <span className="eyebrow">Local GAN Studio</span>
-        <h1>Une vraie interface pour ton générateur PyTorch.</h1>
+        <h1>Une vraie interface pour ton generateur PyTorch.</h1>
         <p>
-          Cette app Next.js pilote le script Python existant dans{" "}
-          <code>course_gan</code>, relance la génération à partir du checkpoint local et
-          affiche directement l’image produite, sans listing brut de fichiers.
+          Cette app Next.js pilote le script Python existant dans <code>classicGAN</code>,
+          relance la generation a partir du checkpoint local et affiche directement l&apos;image
+          produite, sans listing brut de fichiers.
         </p>
       </section>
 
