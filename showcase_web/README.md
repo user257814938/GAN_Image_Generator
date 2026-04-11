@@ -4,14 +4,14 @@ Vitrine Next.js pour afficher une galerie d'images issues de `classicGAN`.
 
 ## Role
 
-Cette application n'entraine pas le modele et ne lance pas d'inference Python en production.
-Elle affiche simplement des images exportees au prealable dans :
+Cette application n'entraîne pas le modèle et ne lance pas d'inférence Python en production.
+Elle affiche simplement des images exportées au préalable dans :
 
 ```text
 public/generated/
 ```
 
-La liste des images affichees est declaree dans :
+La liste des images affichées est déclarée dans :
 
 ```text
 data/gallery.js
@@ -44,4 +44,4 @@ python export_vercel_gallery.py --count 50
 - Framework Preset : `Next.js`
 - Environment Variables : aucune
 
-Le site deploie uniquement la vitrine et les images statiques exportees.
+Le site déploie uniquement la vitrine et les images statiques exportées.

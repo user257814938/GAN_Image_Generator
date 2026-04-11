@@ -1,13 +1,13 @@
 # classicGAN Project
 
-Projet organise autour de deux usages distincts :
+Projet organisé autour de deux usages distincts :
 
-- `classicGAN/` : le moteur local pour entrainer le modele, generer des images et produire des apercus.
-- `showcase_web/` : la vitrine web statique destinee au deploiement cloud et a la presentation client.
+- `classicGAN/` : le moteur local pour entraîner le modèle, générer des images et produire des aperçus.
+- `showcase_web/` : la vitrine web statique destinée au déploiement cloud et à la présentation client.
 
 ## Structure
 
-- `classicGAN/` : code PyTorch, entrainement, checkpoints, exports.
+- `classicGAN/` : code PyTorch, entraînement, checkpoints, exports.
 - `showcase_web/` : application Next.js pour afficher une galerie d'images.
 - `request.json` : fichier local temporaire.
 
@@ -37,11 +37,11 @@ pip install -r requirements.txt
 
 Important :
 
-- le code est versionne dans GitHub ;
-- les dossiers `data/`, `outputs/` et `checkpoints/` ne sont pas pushes ;
-- si tu clones seulement le repo, tu n'auras donc ni dataset local deja telecharge, ni checkpoint pre-entraine.
+- le code est versionné dans GitHub ;
+- les dossiers `data/`, `outputs/` et `checkpoints/` ne sont pas poussés ;
+- si tu clones seulement le repo, tu n'auras donc ni dataset local déjà téléchargé, ni checkpoint pré-entraîné.
 
-### 3. Deux options pour demarrer le modele local
+### 3. Deux options pour démarrer le modèle local
 
 **Option A : tu as deja un checkpoint local**
 
@@ -51,7 +51,7 @@ Copie ton fichier `last.pt` ici :
 classicGAN/checkpoints/last.pt
 ```
 
-Puis genere un apercu :
+Puis génère un aperçu :
 
 ```powershell
 python generate.py --checkpoint checkpoints/last.pt --num-images 16
@@ -59,25 +59,25 @@ python generate.py --checkpoint checkpoints/last.pt --num-images 16
 
 **Option B : tu pars uniquement du GitHub**
 
-Il faut reentrainer le modele :
+Il faut réentraîner le modèle :
 
 ```powershell
 python train.py --preset smoke --dataset svhn
 ```
 
-Puis, pour un entrainement plus long :
+Puis, pour un entraînement plus long :
 
 ```powershell
 python train.py --preset improved --dataset svhn
 ```
 
-Ensuite tu peux generer un apercu :
+Ensuite tu peux générer un aperçu :
 
 ```powershell
 python generate.py --checkpoint checkpoints/last.pt --num-images 16
 ```
 
-Les apercus seront enregistres dans :
+Les aperçus seront enregistrés dans :
 
 ```text
 classicGAN/outputs/
@@ -85,7 +85,7 @@ classicGAN/outputs/
 
 ### 4. Exporter des images vers la vitrine web
 
-Depuis `classicGAN/`, tu peux generer automatiquement un lot d'images pour la vitrine :
+Depuis `classicGAN/`, tu peux générer automatiquement un lot d'images pour la vitrine :
 
 ```powershell
 python export_vercel_gallery.py --count 50
@@ -118,7 +118,7 @@ http://localhost:3000
 - Framework Preset : `Next.js`
 - Environment Variables : aucune pour cette version
 
-Logique de deploiement :
+Logique de déploiement :
 
 - `classicGAN` ne tourne pas sur Vercel ;
-- `showcase_web` affiche uniquement les images exportees dans `public/generated/`.
+- `showcase_web` affiche uniquement les images exportées dans `public/generated/`.

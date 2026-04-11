@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function pickRandomImage(images, currentSrc = null) {
   if (!images.length) {
@@ -20,92 +20,94 @@ function pickRandomImage(images, currentSrc = null) {
   return candidate;
 }
 
-export default function GeneratePanel({ images = [], initialImage = null }) {
+export default function GeneratePanel({ images = [], initialImage = null, copy }) {
   const [currentImage, setCurrentImage] = useState(initialImage);
+  const [isLoading, setIsLoading] = useState(false);
+  const timeoutRef = useRef(null);
   const imageUrl = currentImage?.src ?? null;
 
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   function handlePickNext() {
+    if (!images.length || isLoading) {
+      return;
+    }
+
     const nextImage = pickRandomImage(images, currentImage?.src ?? null);
-    setCurrentImage(nextImage);
+    setIsLoading(true);
+
+    timeoutRef.current = window.setTimeout(() => {
+      setCurrentImage(nextImage);
+      setIsLoading(false);
+      timeoutRef.current = null;
+    }, 2000);
   }
 
   return (
     <section className="grid">
       <aside className="panel controls">
-        <h2>Explorer la collection</h2>
-        <p>
-          Chaque clic affiche une nouvelle variation issue du modele classicGAN. Cette
-          demonstration a ete pensee pour montrer la diversite visuelle que peut produire un GAN
-          dans un cadre de presentation client.
-        </p>
-
-        <div className="form-grid">
-          <button className="primary-button" type="button" onClick={handlePickNext} disabled={!images.length}>
-            {images.length ? "Afficher une autre generation" : "Galerie indisponible"}
-          </button>
-
-          <p className="field-help">
-            Chaque visuel correspond a un point different dans l&apos;espace latent du modele. Le
-            changement d&apos;image permet d&apos;observer rapidement l&apos;etendue des rendus que
-            cette approche generative peut proposer.
-          </p>
-        </div>
-
-        <div className="badge-row">
-          <span className="badge">Images: {images.length}</span>
-          <span className="badge">Modele: classicGAN</span>
-          <span className="badge">Generation visuelle</span>
-        </div>
+        <h2>{copy.panel.title}</h2>
+        <p>{copy.panel.description}</p>
 
         {currentImage ? (
           <div className="meta-block">
-            <p className="meta-line">
-              Titre : <code>{currentImage.title ?? "Sans titre"}</code>
-            </p>
+            {currentImage.model ? (
+              <p className="meta-line">
+                {copy.panel.model} : <code>{currentImage.model}</code>
+              </p>
+            ) : null}
             {currentImage.seed !== undefined ? (
               <p className="meta-line">
-                Seed : <code>{currentImage.seed}</code>
+                {copy.panel.seed} : <code>{currentImage.seed}</code>
               </p>
             ) : null}
             {currentImage.dataset ? (
               <p className="meta-line">
-                Dataset : <code>{currentImage.dataset}</code>
-              </p>
-            ) : null}
-            {currentImage.model ? (
-              <p className="meta-line">
-                Variante : <code>{currentImage.model}</code>
+                {copy.panel.dataset} : <code>{currentImage.dataset}</code>
               </p>
             ) : null}
           </div>
         ) : (
           <div className="meta-block">
-            <p className="meta-line">Aucune image n&apos;est disponible pour le moment.</p>
-            <p className="meta-line">
-              La galerie sera renseignee avec de nouvelles generations des que la prochaine serie
-              d&apos;images sera prete.
-            </p>
+            <p className="meta-line">{copy.panel.emptyTitle}</p>
+            <p className="meta-line">{copy.panel.emptyDescription}</p>
           </div>
         )}
+
+        <div className="form-grid">
+          <button className="primary-button" type="button" onClick={handlePickNext} disabled={!images.length || isLoading}>
+            {!images.length
+              ? copy.panel.buttonEmpty
+              : isLoading
+                ? copy.panel.buttonLoading
+                : copy.panel.buttonIdle}
+          </button>
+        </div>
       </aside>
 
       <section className="panel viewer">
         <div className="toolbar">
           <div>
-            <h2>Apercu du modele</h2>
-            <p>
-              Le rendu ci-dessous illustre une sortie du modele a partir d&apos;une configuration
-              latente differente. L&apos;objectif est de montrer la coherence generale et la
-              variete des resultats obtenus.
-            </p>
+            <h2>{copy.viewer.title}</h2>
+            <p>{copy.viewer.description}</p>
           </div>
 
-          <div className="badge-row">
-            <span className="badge">Demonstration client</span>
-            <span className="badge">IA generative</span>
+          <div>
             {imageUrl ? (
               <a className="secondary-button" href={imageUrl} target="_blank" rel="noreferrer">
-                Ouvrir l&apos;image
+                <svg className="external-icon" viewBox="0 0 16 16" aria-hidden="true">
+                  <path
+                    d="M9.5 2H14v4.5h-1.5V4.56L7.53 9.53 6.47 8.47 11.44 3.5H9.5V2ZM3 3.5h4v1.5H4.5v7h7V9h1.5v4H3v-9.5Z"
+                    fill="currentColor"
+                  />
+                </svg>
+                <span>{copy.viewer.openImage}</span>
               </a>
             ) : null}
           </div>
@@ -113,14 +115,22 @@ export default function GeneratePanel({ images = [], initialImage = null }) {
 
         <div className="image-frame">
           {imageUrl ? (
-            <img src={imageUrl} alt={currentImage.title ?? "Image de demonstration classicGAN"} />
+            <>
+              <img
+                className={isLoading ? "image-loading" : ""}
+                src={imageUrl}
+                alt={currentImage.title ?? copy.viewer.imageAlt}
+              />
+              {isLoading ? (
+                <div className="image-overlay">
+                  <span className="loading-pulse" />
+                </div>
+              ) : null}
+            </>
           ) : (
             <div className="image-placeholder">
-              <h3>Galerie en preparation.</h3>
-              <p>
-                Les prochaines generations viendront alimenter cette vitrine pour presenter une
-                selection representative des capacites du modele.
-              </p>
+              <h3>{copy.viewer.placeholderTitle}</h3>
+              <p>{copy.viewer.placeholderDescription}</p>
             </div>
           )}
         </div>

@@ -1,6 +1,6 @@
 # classicGAN
 
-Prototype local de Vanilla GAN entraine sur `CIFAR-10` ou `SVHN`.
+Prototype local de Vanilla GAN entraîné sur `CIFAR-10` ou `SVHN`.
 
 ## Installation
 
@@ -12,38 +12,38 @@ pip install -r requirements.txt
 
 ## Si tu pars d'un clone GitHub
 
-Quand tu clones le repo, tu recuperes :
+Quand tu clones le repo, tu récupères :
 
 - le code ;
-- les scripts d'entrainement et de generation ;
+- les scripts d'entraînement et de génération ;
 - la structure du projet.
 
-En revanche, tu ne recuperes pas automatiquement :
+En revanche, tu ne récupères pas automatiquement :
 
 - `data/`
 - `outputs/`
 - `checkpoints/`
 
-Ces dossiers sont ignores par Git. Donc, apres un clone GitHub, tu dois :
+Ces dossiers sont ignorés par Git. Donc, après un clone GitHub, tu dois :
 
 1. soit remettre un checkpoint manuellement dans `checkpoints/last.pt`
-2. soit reentrainer le modele
+2. soit réentraîner le modèle
 
-## Demarrage rapide
+## Démarrage rapide
 
-### Reentrainement court
+### Réentraînement court
 
 ```powershell
 python train.py --preset smoke --dataset svhn
 ```
 
-### Entrainement plus long
+### Entraînement plus long
 
 ```powershell
 python train.py --preset improved --dataset svhn
 ```
 
-### Generation d'un apercu
+### Génération d'un aperçu
 
 ```powershell
 python generate.py --checkpoint checkpoints/last.pt --num-images 16
@@ -55,7 +55,7 @@ python generate.py --checkpoint checkpoints/last.pt --num-images 16
 python export_vercel_gallery.py --count 50
 ```
 
-Par defaut, ce script envoie les images vers :
+Par défaut, ce script envoie les images vers :
 
 ```text
 ../showcase_web/public/generated/
@@ -64,9 +64,9 @@ Par defaut, ce script envoie les images vers :
 
 ## Fichiers principaux
 
-- `train.py` : entraine le GAN et sauvegarde des echantillons PNG.
-- `generate.py` : recharge un checkpoint et genere une grille d'images.
+- `train.py` : entraîne le GAN et sauvegarde des échantillons PNG.
+- `generate.py` : recharge un checkpoint et génère une grille d'images.
 - `export_vercel_gallery.py` : exporte un lot d'images individuelles pour la vitrine web.
-- `models.py` : architecture du generateur et du discriminateur.
-- `config.py` : hyperparametres par defaut et presets.
+- `models.py` : architecture du générateur et du discriminateur.
+- `config.py` : hyperparamètres par défaut et presets.
 - `utils.py` : data loading, seed, sauvegarde de checkpoints et d'images.
