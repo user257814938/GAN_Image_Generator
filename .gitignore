@@ -10,8 +10,8 @@ classicGAN/outputs/
 classicGAN/checkpoints/
 
 # Next.js / Node
-gan_nextjs/node_modules/
-gan_nextjs/.next/
+showcase_web/node_modules/
+showcase_web/.next/
 
 # Local temp files
 request.json
